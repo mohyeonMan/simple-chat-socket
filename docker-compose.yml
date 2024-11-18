@@ -1,0 +1,30 @@
+version: '3.8'
+
+services:
+  app:
+    build:
+      context: .  # 현재 디렉토리에서 Dockerfile 사용
+    image: simple-chat-socket
+    ports:
+      - "8080:8080"  # Spring Boot 서버
+    volumes:
+      - .:/app  # 로컬 파일을 컨테이너에 마운트
+    environment:
+      - SPRING_REDIS_HOST=redis  # Redis 호스트명
+      - SPRING_REDIS_PORT=6379   # Redis 포트
+    depends_on:
+      - redis  # Redis 컨테이너 의존성 추가
+    command: ./gradlew bootRun  # 코드 변경 시 자동 실행
+    networks:
+      - app-network
+
+  redis:
+    image: redis
+    container_name: redis
+    ports:
+      - "6379:6379"  # Redis 기본 포트
+    networks:
+      - app-network
+
+networks:
+  app-network:
