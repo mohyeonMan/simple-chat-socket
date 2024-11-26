@@ -12,11 +12,13 @@ Thumbs.db
 *.iml
 
 # Java/Gradle specific files
+/.gradle/
 /target/
 /build/
 /out/
 *.jar
 *.war
+*.class
 
 # Docker files
 *.pid
