@@ -25,7 +25,6 @@ pipeline {
                 echo 'Preparing application.yml...'
                 withCredentials([file(credentialsId: 'application-socket', variable: 'application')]) {
                     script {
-                        // Ensure the directory exists
                         sh '''
                             mkdir -p src/main/resources
                             cp $application src/main/resources/application.yml
