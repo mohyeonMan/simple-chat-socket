@@ -22,7 +22,7 @@ public class PublicIpUtil {
             try {
                 return InetAddress.getLocalHost().getHostAddress();
             } catch (Exception e2) {
-                throw new RuntimeException("Failed to fetch public IP", e);
+                throw new RuntimeException("Failed to fetch public IP", e2);
             }
         }
     }
