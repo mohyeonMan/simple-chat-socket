@@ -27,6 +27,7 @@ services:
         - "traefik.http.routers.catchall.entrypoints=web,websecure"
         - "traefik.http.routers.catchall.service=app"
         - "traefik.http.routers.catchall.middlewares=websocket"
+        - "traefik.http.services.app.loadbalancer.server.port=80"
         - "traefik.http.services.app.loadbalancer.sticky.cookie.name=traefik-sticky-cookie"
         - "traefik.http.services.app.loadbalancer.sticky.cookie.secure=true"
         - "traefik.http.middlewares.websocket.headers.customrequestheaders.Connection=Upgrade"
