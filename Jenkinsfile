@@ -86,6 +86,7 @@ pipeline {
                 // 2. 원격 서버로 파일 복사
                 sh '''
                 scp -i ${PEM_FILE} -o StrictHostKeyChecking=no docker-compose.yml ${SSH_USER}@${SSH_SERVER}:/home/ubuntu/
+                scp -i ${PEM_FILE} -o StrictHostKeyChecking=no traefik.yml ${SSH_USER}@${SSH_SERVER}:/home/ubuntu/
                 '''
 
                 // 3. 원격 서버에서 스택 배포
