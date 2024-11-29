@@ -78,22 +78,14 @@ pipeline {
             usernamePassword(credentialsId: 'simple-chat-socket-ssh', usernameVariable: 'SSH_USER', passwordVariable: 'SSH_SERVER')
         ]) {
             script {
-                // 1. docker-compose.yml 파일에 DOCKER_IMAGE 값 삽입
-                sh '''
-                sed -i "s|simple-chat-socket:latest|${DOCKER_IMAGE}|" docker-compose.yml
-                '''
 
-                // 2. 원격 서버로 파일 복사
                 sh '''
                 scp -i ${PEM_FILE} -o StrictHostKeyChecking=no docker-compose.yml ${SSH_USER}@${SSH_SERVER}:/home/ubuntu/
                 scp -i ${PEM_FILE} -o StrictHostKeyChecking=no traefik.yml ${SSH_USER}@${SSH_SERVER}:/home/ubuntu/
                 '''
-
-                // 3. 원격 서버에서 스택 배포
-                sh '''
+                sh '''docker
                 ssh -i ${PEM_FILE} -o StrictHostKeyChecking=no ${SSH_USER}@${SSH_SERVER} <<EOF
-                cd /home/ubuntu
-                docker stack deploy -c docker-compose.yml simple-chat-socket-manager
+                env DOCKER_IMAGE='${DOCKER_IMAGE}' docker stack deploy -c docker-compose.yml simple-chat-socket
                 <<EOF
                 '''
             }
