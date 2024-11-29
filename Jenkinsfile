@@ -62,9 +62,18 @@ pipeline {
                 withCredentials([usernamePassword(credentialsId: 'docker-credentials', usernameVariable: 'DOCKER_USERNAME', passwordVariable: 'DOCKER_PASSWORD')]) {
                     script {
                         sh '''
-                            echo $DOCKER_PASSWORD | docker login -u $DOCKER_USERNAME --password-stdin
-                            docker push ${DOCKER_IMAGE}
-                            docker logout
+                        sed -i "s|simple-chat-socket:latest|${DOCKER_IMAGE}|" docker-compose.yml
+                        '''
+
+                        sh '''
+                        scp -i ${PEM_FILE} -o StrictHostKeyChecking=no docker-compose.yml ${SSH_USER}@${SSH_SERVER}:/home/ubuntu/
+                        '''
+
+                        sh '''
+                        ssh -i ${PEM_FILE} -o StrictHostKeyChecking=no ${SSH_USER}@${SSH_SERVER} <<EOF
+                        cd /home/ubuntu
+                        docker stack deploy -c docker-compose.yml simple-chat-socket-manager
+                        <<EOF
                         '''
                     }
                 }
@@ -81,7 +90,7 @@ pipeline {
                 sh '''
                 ssh -i ${PEM_FILE} -o StrictHostKeyChecking=no ${SSH_USER}@${SSH_SERVER} <<EOF
                 export DOCKER_IMAGE=${DOCKER_IMAGE}
-                docker stack deploy -c docker-compose.yml simple-chat-socket-manager
+                docker stack deploy -c docker-compose.yml simple-chat-socket
                 <<EOF
                 '''
             }
