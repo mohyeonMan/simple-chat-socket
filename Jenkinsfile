@@ -82,7 +82,7 @@ pipeline {
                 ssh -i ${PEM_FILE} -o StrictHostKeyChecking=no ${SSH_USER}@${SSH_SERVER} <<EOF
                 export DOCKER_IMAGE=${DOCKER_IMAGE}
                 docker stack deploy -c docker-compose.yml simple-chat-socket-manager
-                EOF
+                <<EOF
                 '''
             }
         }
