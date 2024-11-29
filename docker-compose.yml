@@ -37,8 +37,6 @@ services:
     image: ${DOCKER_IMAGE}
     networks:
       - app-network
-    ports:
-      - "80:80"
     deploy:
       mode: global
       placement:
