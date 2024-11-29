@@ -72,21 +72,6 @@ pipeline {
         }
 
         stage('Deploy to Swarm') {
-            steps {
-                withCredentials([
-                    file(credentialsId: 'simple-chat-socket-pem', variable: 'PEM_FILE'),
-                    usernamePassword(credentialsId: 'simple-chat-socket-ssh', usernameVariable: 'SSH_USER', passwordVariable: 'SSH_SERVER')
-                ]) {
-                    sh '''
-                    ssh -i ${PEM_FILE} -o StrictHostKeyChecking=no ${SSH_USER}@${SSH_SERVER} <<EOF
-
-                    <<EOF
-                    '''
-                }
-            }
-        }
-
-        stage('Deploy to Swarm') {
     steps {
         withCredentials([
             file(credentialsId: 'simple-chat-socket-pem', variable: 'PEM_FILE'),
