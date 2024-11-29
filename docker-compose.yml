@@ -20,6 +20,9 @@ services:
           - node.role == manager
       labels:
         - "traefik.enable=true"
+        - "traefik.http.routers.traefik.rule=PathPrefix(`/`)"
+        - "traefik.http.routers.traefik.service=api@internal"
+        - "traefik.http.services.traefik.loadbalancer.server.port=8080"
         - "traefik.http.routers.catchall.rule=PathPrefix(`/`)"
         - "traefik.http.routers.catchall.entrypoints=web,websecure"
         - "traefik.http.routers.catchall.service=app"
