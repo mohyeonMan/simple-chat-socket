@@ -1,7 +1,6 @@
 package com.jhpark.simple_chat_socket.socket.handler;
 
 
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.event.EventListener;
 import org.springframework.messaging.simp.stomp.StompHeaderAccessor;
 import org.springframework.messaging.simp.stomp.StompCommand;
@@ -11,6 +10,7 @@ import org.springframework.web.socket.messaging.SessionSubscribeEvent;
 import org.springframework.web.socket.messaging.SessionUnsubscribeEvent;
 
 import com.jhpark.simple_chat_socket.common.util.ObjectMapperUtil;
+import com.jhpark.simple_chat_socket.common.util.ServerIpUtil;
 import com.jhpark.simple_chat_socket.security.util.SecurityUtil;
 
 import lombok.Builder;
@@ -25,7 +25,6 @@ import org.springframework.kafka.core.KafkaTemplate;
 @RequiredArgsConstructor
 public class StompEventHandler {
 
-    @Value("${INSTANCE_IP}")
     private final String serverIp;
     private final KafkaTemplate<String, String> kafkaTemplate;
     private final ObjectMapperUtil objectMapperUtil;
@@ -33,11 +32,11 @@ public class StompEventHandler {
     private static final String SESSION_ONLINE_TOPIC = "session-online";
     private static final String SESSION_OFFLINE_TOPIC = "session-offline";
 
-    // public StompEventHandler(KafkaTemplate<String, String> kafkaTemplate, ObjectMapperUtil objectMapperUtil) throws Exception {
-    //     this.kafkaTemplate = kafkaTemplate;
-    //     this.serverIp = ServerIpUtil.getServerIp();
-    //     this.objectMapperUtil = objectMapperUtil;
-    // }
+    public StompEventHandler(KafkaTemplate<String, String> kafkaTemplate, ObjectMapperUtil objectMapperUtil) throws Exception {
+        this.kafkaTemplate = kafkaTemplate;
+        this.serverIp = ServerIpUtil.getServerIp();
+        this.objectMapperUtil = objectMapperUtil;
+    }
 
     @Data
     @Builder

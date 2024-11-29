@@ -1,0 +1,47 @@
+version: "3.8"
+
+services:
+  traefik:
+    image: traefik:v2.10
+    ports:
+      - 80:80    # HTTP
+      - 443:443  # HTTPS
+      - 8080:8080 # Traefik 대시보드 (외부 9090 -> 내부 8080)
+    networks:
+      - app-network
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    configs:
+      - source: traefik-config
+        target: /etc/traefik/traefik.yml
+    deploy:
+      placement:
+        constraints:
+          - node.role == manager
+      labels:
+        - "traefik.enable=true"
+        - "traefik.http.routers.traefik.rule=PathPrefix(`/`)"
+        - "traefik.http.routers.traefik.service=api@internal"
+        - "traefik.http.services.traefik.loadbalancer.server.port=8080"
+
+  app:
+    image: ${DOCKER_IMAGE}
+    networks:
+      - app-network
+    deploy:
+      mode: global
+      placement:
+        constraints:
+          - node.role == worker
+      labels:
+        - "traefik.enable=true"
+        - "traefik.http.routers.app.rule=PathPrefix(`/`)"
+        - "traefik.http.services.app.loadbalancer.server.port=80"
+
+networks:
+  app-network:
+    driver: overlay
+
+configs:
+  traefik-config:
+    file: traefik.yml # Traefik 설정 파일

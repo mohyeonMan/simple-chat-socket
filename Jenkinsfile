@@ -79,13 +79,30 @@ pipeline {
                 ]) {
                     sh '''
                     ssh -i ${PEM_FILE} -o StrictHostKeyChecking=no ${SSH_USER}@${SSH_SERVER} <<EOF
-                    docker service update --image ${DOCKER_IMAGE} simple-chat-socket || \
-                    docker service create --name simple-chat-socket --replicas 1 -p 80:80 ${DOCKER_IMAGE}
+
                     <<EOF
                     '''
                 }
             }
         }
+
+        stage('Deploy to Swarm') {
+    steps {
+        withCredentials([
+            file(credentialsId: 'simple-chat-socket-pem', variable: 'PEM_FILE'),
+            usernamePassword(credentialsId: 'simple-chat-socket-ssh', usernameVariable: 'SSH_USER', passwordVariable: 'SSH_SERVER')
+        ]) {
+            script {
+                sh '''
+                ssh -i ${PEM_FILE} -o StrictHostKeyChecking=no ${SSH_USER}@${SSH_SERVER} <<EOF
+                export DOCKER_IMAGE=${DOCKER_IMAGE}
+                docker stack deploy -c docker-compose.yml simple-chat-socket-manager
+                EOF
+                '''
+            }
+        }
+    }
+}
     }
 
     post {
