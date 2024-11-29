@@ -1,5 +1,13 @@
 version: "3.8"
 
+networks:
+  app-network:
+    driver: overlay
+
+configs:
+  traefik-config:
+    file: traefik.yml
+    
 services:
   traefik:
     image: traefik:v2.10
@@ -20,20 +28,10 @@ services:
           - node.role == manager
       labels:
         - "traefik.enable=true"
-        - "traefik.http.routers.traefik.rule=PathPrefix(`/`)"
+        - "traefik.http.routers.traefik.rule=PathPrefix(`/traefik`)" # 대시보드 전용 경로
         - "traefik.http.routers.traefik.service=api@internal"
+        - "traefik.http.routers.traefik.entrypoints=web"
         - "traefik.http.services.traefik.loadbalancer.server.port=8080"
-        - "traefik.http.routers.catchall.rule=PathPrefix(`/`)"
-        - "traefik.http.routers.catchall.entrypoints=web,websecure"
-        - "traefik.http.routers.catchall.service=app"
-        - "traefik.http.routers.catchall.middlewares=websocket"
-        - "traefik.http.services.app.loadbalancer.server.port=80"
-        - "traefik.http.services.app.loadbalancer.sticky.cookie.name=traefik-sticky-cookie"
-        - "traefik.http.services.app.loadbalancer.sticky.cookie.secure=true"
-        - "traefik.http.middlewares.websocket.headers.customrequestheaders.Connection=Upgrade"
-        - "traefik.http.middlewares.websocket.headers.customrequestheaders.Upgrade=websocket"
-        - "traefik.http.middlewares.catchall-retry.retry.attempts=3"
-        - "traefik.http.middlewares.catchall-retry.retry.initialinterval=500ms"
 
   app:
     image: ${DOCKER_IMAGE}
@@ -47,15 +45,9 @@ services:
       labels:
         - "traefik.enable=true"
         - "traefik.http.routers.app.rule=PathPrefix(`/`)"
-        - "traefik.http.services.app.loadbalancer.server.port=80"
         - "traefik.http.routers.app.entrypoints=web,websecure"
+        - "traefik.http.services.app.loadbalancer.server.port=80"
         - "traefik.http.services.app.loadbalancer.sticky.cookie.name=traefik-sticky-cookie"
         - "traefik.http.services.app.loadbalancer.sticky.cookie.secure=true"
-
-networks:
-  app-network:
-    driver: overlay
-
-configs:
-  traefik-config:
-    file: traefik.yml
+        - "traefik.http.middlewares.websocket.headers.customrequestheaders.Connection=Upgrade"
+        - "traefik.http.middlewares.websocket.headers.customrequestheaders.Upgrade=websocket"
