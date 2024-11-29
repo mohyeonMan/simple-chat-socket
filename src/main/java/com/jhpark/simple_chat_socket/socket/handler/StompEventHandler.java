@@ -10,7 +10,7 @@ import org.springframework.web.socket.messaging.SessionSubscribeEvent;
 import org.springframework.web.socket.messaging.SessionUnsubscribeEvent;
 
 import com.jhpark.simple_chat_socket.common.util.ObjectMapperUtil;
-import com.jhpark.simple_chat_socket.common.util.PublicIpUtil;
+import com.jhpark.simple_chat_socket.common.util.ServerIpUtil;
 import com.jhpark.simple_chat_socket.security.util.SecurityUtil;
 
 import lombok.Builder;
@@ -32,7 +32,7 @@ public class StompEventHandler {
 
     public StompEventHandler(KafkaTemplate<String, String> kafkaTemplate, ObjectMapperUtil objectMapperUtil) throws Exception {
         this.kafkaTemplate = kafkaTemplate;
-        this.serverIp = PublicIpUtil.fetchPublicIp();
+        this.serverIp = ServerIpUtil.getServerIp();
         this.objectMapperUtil = objectMapperUtil;
     }
 
