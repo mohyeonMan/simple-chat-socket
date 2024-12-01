@@ -44,8 +44,6 @@ services:
     image: ${DOCKER_IMAGE}
     networks:
       - app-network
-    environment:
-      - PRIVATE_IP={{.Node.IP}}
     deploy:
       mode: global
       placement:
