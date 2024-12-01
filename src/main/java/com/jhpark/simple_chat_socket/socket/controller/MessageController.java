@@ -37,11 +37,6 @@ public class MessageController {
         private String message;
     }
 
-    @GetMapping("/test")
-    public void loadBalanceTest() {
-        log.info("request arrived");    
-    }
-
     @MessageMapping("/send/{roomId}")
     public void sendMessage(
         @DestinationVariable("roomId") String roomId,
