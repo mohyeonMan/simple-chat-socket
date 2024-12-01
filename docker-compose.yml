@@ -42,6 +42,8 @@ services:
 
   app:
     image: ${DOCKER_IMAGE}
+    ports:
+    - "80:80"
     networks:
       - app-network
     deploy:
