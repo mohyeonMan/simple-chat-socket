@@ -81,7 +81,6 @@ pipeline {
 
                 sh '''
                 scp -i ${PEM_FILE} -o StrictHostKeyChecking=no docker-compose.yml ${SSH_USER}@${SSH_SERVER}:/home/ubuntu/
-                scp -i ${PEM_FILE} -o StrictHostKeyChecking=no traefik.yml ${SSH_USER}@${SSH_SERVER}:/home/ubuntu/
                 '''
                 sh '''docker
                 ssh -i ${PEM_FILE} -o StrictHostKeyChecking=no ${SSH_USER}@${SSH_SERVER} <<EOF
