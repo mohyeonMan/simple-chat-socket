@@ -17,6 +17,9 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+
 
 @Slf4j
 @Controller
@@ -32,6 +35,11 @@ public class MessageController {
         private Long userId;
         private String roomId;
         private String message;
+    }
+
+    @GetMapping("/test")
+    public void loadBalanceTest() {
+        log.info("request arrived");    
     }
 
     @MessageMapping("/send/{roomId}")
