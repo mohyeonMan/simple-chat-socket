@@ -10,6 +10,7 @@ import org.springframework.web.socket.messaging.SessionSubscribeEvent;
 import org.springframework.web.socket.messaging.SessionUnsubscribeEvent;
 
 import com.jhpark.simple_chat_socket.common.util.ObjectMapperUtil;
+import com.jhpark.simple_chat_socket.common.util.ServerIpUtil;
 import com.jhpark.simple_chat_socket.security.util.SecurityUtil;
 
 import lombok.Builder;
@@ -29,12 +30,13 @@ public class StompEventHandler {
     private static final String SESSION_ONLINE_TOPIC = "session-online";
     private static final String SESSION_OFFLINE_TOPIC = "session-offline";
 
-    public StompEventHandler(KafkaTemplate<String, String> kafkaTemplate, ObjectMapperUtil objectMapperUtil) throws Exception {
+    public StompEventHandler(KafkaTemplate<String, String> kafkaTemplate, 
+                             ObjectMapperUtil objectMapperUtil, 
+                             ServerIpUtil serverIpUtil) {
         this.kafkaTemplate = kafkaTemplate;
-        this.serverIp = System.getenv("PRIVATE_IP");
+        this.serverIp = serverIpUtil.getServerIp();
         this.objectMapperUtil = objectMapperUtil;
     }
-
     @Data
     @Builder
     public static class SessionMessage {

@@ -1,43 +1,63 @@
 package com.jhpark.simple_chat_socket.common.util;
 
-import org.springframework.cloud.aws.context.support.env.AwsCloudEnvironmentCheckUtils;
-import org.springframework.core.env.Environment;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
+import org.springframework.web.client.RestTemplate;
 
-import java.net.InetAddress;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 @Component
+@RequiredArgsConstructor
 public class ServerIpUtil {
 
-    private final Environment environment;
-
-    public ServerIpUtil(Environment environment) {
-        this.environment = environment;
-    }
+    private static final String TOKEN_URL = "http://169.254.169.254/latest/api/token";
+    private static final String PRIVATE_IP_URL = "http://169.254.169.254/latest/meta-data/local-ipv4";
+    private final RestTemplate restTemplate;
 
     public String getServerIp() {
-        // AWS 환경 감지
-        if (AwsCloudEnvironmentCheckUtils.isRunningOnCloudEnvironment()) {
-            return getAwsPrivateIp();
+        if (isAwsEnvironment()) {
+            log.info("AWS Environment");
+            return getPrivateIp();
         } else {
-            return getLocalIp();
+            log.info("Local Environment");
+            return "localhost";
         }
     }
 
-    private String getAwsPrivateIp() {
-        String privateIp = environment.getProperty("cloud.aws.instance.private-ip-address");
-        if (privateIp != null) {
-            return privateIp;
-        } else {
-            throw new RuntimeException("Private IP address not found in AWS metadata");
-        }
-    }
-
-    private String getLocalIp() {
+    public boolean isAwsEnvironment() {
         try {
-            return InetAddress.getLocalHost().getHostAddress();
+            String token = getMetadataToken();
+            return token != null && !token.isEmpty();
         } catch (Exception e) {
-            throw new RuntimeException("Failed to retrieve local IP address", e);
+            return false;
         }
+    }
+
+    public String getPrivateIp() {
+        try {
+            String token = getMetadataToken();
+            HttpHeaders headers = new HttpHeaders();
+            headers.add("X-aws-ec2-metadata-token", token);
+            HttpEntity<Void> entity = new HttpEntity<>(headers);
+
+            ResponseEntity<String> response = restTemplate.exchange(PRIVATE_IP_URL, HttpMethod.GET, entity, String.class);
+            return response.getBody();
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to retrieve private IP from AWS metadata service", e);
+        }
+    }
+
+    private String getMetadataToken() {
+        HttpHeaders headers = new HttpHeaders();
+        headers.add("X-aws-ec2-metadata-token-ttl-seconds", "21600");
+        HttpEntity<Void> entity = new HttpEntity<>(headers);
+
+        ResponseEntity<String> response = restTemplate.exchange(TOKEN_URL, HttpMethod.PUT, entity, String.class);
+        return response.getBody();
     }
 }
