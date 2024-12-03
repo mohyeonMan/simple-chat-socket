@@ -13,6 +13,7 @@ public class SecurityConfig {
         http
                 .authorizeHttpRequests(authorize -> authorize
                         .requestMatchers("/ws-chat/**").permitAll()
+                        .requestMatchers("/broadcast").permitAll()
                 )
                 .csrf(csrf -> csrf.disable()); 
 

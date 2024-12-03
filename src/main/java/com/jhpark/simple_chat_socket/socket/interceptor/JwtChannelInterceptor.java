@@ -1,4 +1,4 @@
-package com.jhpark.simple_chat_socket.security.handler;
+package com.jhpark.simple_chat_socket.socket.interceptor;
 
 import org.springframework.messaging.Message;
 import org.springframework.messaging.MessageChannel;
@@ -21,7 +21,7 @@ import lombok.extern.slf4j.Slf4j;
 public class JwtChannelInterceptor implements ChannelInterceptor {
 
     private final AuthService authService;
-    private static final String AUTH_PREFIX = "Bearer";
+    private static final String AUTH_PREFIX = "Bearer ";
     
     @Override
     public Message<?> preSend(Message<?> message, MessageChannel channel) {
@@ -31,16 +31,18 @@ public class JwtChannelInterceptor implements ChannelInterceptor {
             return message;
         }
         
-        final String authHeader = accessor.getFirstNativeHeader("Authorization").trim();
+        final String authHeader = accessor.getFirstNativeHeader("Authorization");
         if (authHeader != null && authHeader.startsWith(AUTH_PREFIX)) {
             final String token = authHeader.substring(AUTH_PREFIX.length());
             Authentication authentication = authService.checkAccessTokenAndSetAuthentication(token);
             accessor.setUser(authentication);
+            log.info("Authentication = {}", SecurityContextHolder.getContext().getAuthentication().toString());
+    
+            return message;
+        }else{
+            throw new RuntimeException("Authorization is required");
         }
 
-        log.info("Authentication = {}", SecurityContextHolder.getContext().getAuthentication().toString());
-
-        return message;
     }
 
 }

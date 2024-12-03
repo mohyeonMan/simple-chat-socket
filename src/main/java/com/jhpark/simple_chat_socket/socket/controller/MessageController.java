@@ -1,60 +1,59 @@
 package com.jhpark.simple_chat_socket.socket.controller;
 
 import java.security.Principal;
+import java.util.Set;
 
-// import org.springframework.data.redis.core.RedisTemplate;
-// import org.springframework.data.redis.listener.ChannelTopic;
-import org.springframework.kafka.core.KafkaTemplate;
+import org.springframework.http.ResponseEntity;
 import org.springframework.messaging.handler.annotation.DestinationVariable;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.Payload;
+import org.springframework.messaging.simp.user.SimpUser;
 import org.springframework.stereotype.Controller;
 
-import com.jhpark.simple_chat_socket.common.util.ObjectMapperUtil;
-import com.jhpark.simple_chat_socket.security.util.SecurityUtil;
+import com.jhpark.simple_chat_socket.socket.dto.broadcast.BroadcastRequest;
+import com.jhpark.simple_chat_socket.socket.service.MessageBroadcastService;
+import com.jhpark.simple_chat_socket.socket.service.MessageSendService;
+import com.jhpark.simple_chat_socket.socket.service.SessionRegistryService;
 
-import lombok.Builder;
-import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-
 
 @Slf4j
 @Controller
 @RequiredArgsConstructor
 public class MessageController {
 
-    private final KafkaTemplate<String, String> kafkaTemplate;
-    private final ObjectMapperUtil objectMapperUtil;
-
-    @Data
-    @Builder
-    public static class ChatMessage {
-        private Long userId;
-        private String roomId;
-        private String message;
-    }
+    private final SessionRegistryService sessionRegistryService;
+    private final MessageBroadcastService messageBroadcastService;
+    private final MessageSendService messageSendService;
 
     @MessageMapping("/send/{roomId}")
     public void sendMessage(
-        @DestinationVariable("roomId") String roomId,
-        @Payload String message,
-        Principal principal
+            @DestinationVariable("roomId") String roomId,
+            @Payload String message,
+            Principal principal
     ) {
-
-        final Long userId = SecurityUtil.extractUserIdFromPrincipal(principal);
-
-        //roomId로 같은 채팅방 내의 사용자들 조회.
-
-        final ChatMessage chatMessage = ChatMessage.builder()
-                .userId(userId)
-                .roomId(roomId)
-                .message(message)
-                .build();
-                
-        log.info("SEND MESSAGE TO KAFKA : user {}, roomId {}, message {} ", userId, roomId, message);
-        kafkaTemplate.send("chat-message", objectMapperUtil.writeValueAsString(chatMessage));
+        messageSendService.sendMessage(roomId, message, principal);
     }
+
+    @GetMapping("check-users")
+    public ResponseEntity<Set<SimpUser>> getMethodName() {
+        return ResponseEntity.ok().body(sessionRegistryService.getUsers());
+    }
+
+    @PostMapping("/broadcast")
+    public ResponseEntity<Void> broadcastMessage(@RequestBody BroadcastRequest broadcastRequest) {
+
+        messageBroadcastService.broadcastMessage(
+                broadcastRequest.getSenderId(),
+                broadcastRequest.getRoomId(),
+                broadcastRequest.getMessage(),
+                broadcastRequest.getUserIds());
+
+        return ResponseEntity.ok().build();
+    }
+
 }

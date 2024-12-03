@@ -1,6 +1,6 @@
 package com.jhpark.simple_chat_socket.socket.config;
 
-import org.springframework.boot.autoconfigure.security.oauth2.resource.OAuth2ResourceServerProperties.Jwt;
+
 import org.springframework.context.annotation.Configuration;
 import org.springframework.messaging.simp.config.ChannelRegistration;
 import org.springframework.messaging.simp.config.MessageBrokerRegistry;
@@ -8,7 +8,8 @@ import org.springframework.web.socket.config.annotation.EnableWebSocketMessageBr
 import org.springframework.web.socket.config.annotation.StompEndpointRegistry;
 import org.springframework.web.socket.config.annotation.WebSocketMessageBrokerConfigurer;
 
-import com.jhpark.simple_chat_socket.security.handler.JwtChannelInterceptor;
+import com.jhpark.simple_chat_socket.socket.interceptor.JwtChannelInterceptor;
+import com.jhpark.simple_chat_socket.socket.interceptor.SubscriptionInterceptor;
 
 import lombok.RequiredArgsConstructor;
 
@@ -18,11 +19,13 @@ import lombok.RequiredArgsConstructor;
 public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
 
     private final JwtChannelInterceptor jwtChannelInterceptor;
+    private final SubscriptionInterceptor subscriptionInterceptor;
 
-    public static final String TOPIC_PREFIX = "/join";
+    private static final String TOPIC_PREFIX = "/join";
     public static final String QUEUE_PREFIX = "/private";
-    public static final String DESTINATION_PREFIX =  "/message";
-    public static final String END_POINT = "/ws-chat";
+    private static final String DESTINATION_PREFIX =  "/message";
+    private static final String END_POINT = "/ws-chat";
+    public static final String USER_SUBSCRIBE_PREFIX = "/user"+ QUEUE_PREFIX +"/";
 
     @Override
     public void configureMessageBroker(MessageBrokerRegistry config) {
@@ -32,7 +35,6 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
 
     @Override
     public void registerStompEndpoints(StompEndpointRegistry registry) {
-        // WebSocket 엔드포인트 정의 및 SockJS 지원
         registry
             .addEndpoint(END_POINT)
             .setAllowedOriginPatterns("*")
@@ -41,6 +43,9 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
 
     @Override
     public void configureClientInboundChannel(ChannelRegistration registration) {
-        registration.interceptors(jwtChannelInterceptor);
+        registration
+            .interceptors(jwtChannelInterceptor)
+            .interceptors(subscriptionInterceptor)
+        ;
     }
 }

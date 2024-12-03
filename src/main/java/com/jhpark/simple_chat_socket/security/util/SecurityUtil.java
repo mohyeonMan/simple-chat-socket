@@ -16,8 +16,9 @@ public class SecurityUtil {
         return null;
     }
 
-    public static Long extractUserIdFromPrincipal(Principal principalObj) {
-        if (principalObj instanceof Authentication) {
+    public static Long extractUserIdFromPrincipal(final Principal principalObj) {
+
+        if(principalObj instanceof Authentication) {
             Authentication authentication = (Authentication) principalObj;
             return Long.valueOf(authentication.getPrincipal().toString());
         }
