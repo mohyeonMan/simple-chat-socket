@@ -3,8 +3,8 @@ version: "3.8"
 networks:
   app-network:
     driver: overlay
-  host-network:
-    driver: host
+  host:
+    external: true
 
 services:
   traefik:
@@ -46,7 +46,7 @@ services:
     image: ${DOCKER_IMAGE}
     networks:
       - app-network
-      - host-network
+      - host
     deploy:
       mode: global
       placement:
