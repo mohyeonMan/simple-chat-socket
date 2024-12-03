@@ -3,6 +3,8 @@ version: "3.8"
 networks:
   app-network:
     driver: overlay
+  host-network:
+    driver: host
 
 services:
   traefik:
@@ -44,6 +46,7 @@ services:
     image: ${DOCKER_IMAGE}
     networks:
       - app-network
+      - host-network
     deploy:
       mode: global
       placement:
@@ -57,3 +60,8 @@ services:
         # - "traefik.http.services.app.loadbalancer.sticky.cookie.name=traefik-sticky-cookie"
         - "traefik.http.middlewares.websocket.headers.customrequestheaders.Connection=Upgrade"
         - "traefik.http.middlewares.websocket.headers.customrequestheaders.Upgrade=websocket"
+    ports:
+      - target: 80
+        published: 80
+        protocol: tcp
+        mode: host
