@@ -73,6 +73,7 @@ public class StompEventHandler {
         kafkaService.sendSessionOfflineMessage(
             SessionOfflineMessage.builder()
                 .userId(userId)
+                .serverIp(serverIp)
                 .sessionId(sessionId)
                 .build()
         );

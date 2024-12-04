@@ -8,6 +8,7 @@ import lombok.Data;
 public class SessionOfflineMessage {
 
     private Long userId;
+    private String serverIp;
     private String sessionId;
 
 }
