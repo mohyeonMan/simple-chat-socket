@@ -3,8 +3,6 @@ version: "3.8"
 networks:
   app-network:
     driver: overlay
-  host:
-    external: true
 
 services:
   traefik:
@@ -24,7 +22,7 @@ services:
       # Providers
       - "--providers.docker=true"
       - "--providers.docker.swarmMode=true"
-      - "--providers.docker.exposedByDefault=false"    # enable 라벨 추가한 컨테이너만 노출
+      - "--providers.docker.exposedByDefault=false"
       # API
       - "--api.dashboard=true"
       - "--api.insecure=true"
@@ -46,7 +44,6 @@ services:
     image: ${DOCKER_IMAGE}
     networks:
       - app-network
-      - host
     deploy:
       mode: global
       placement:
@@ -62,6 +59,7 @@ services:
         - "traefik.http.middlewares.websocket.headers.customrequestheaders.Upgrade=websocket"
     ports:
       - target: 80
-        published: 80
+        published: 81
         protocol: tcp
         mode: host
+      
