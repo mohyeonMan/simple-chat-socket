@@ -7,7 +7,7 @@ import lombok.Data;
 @Data
 public class BroadcastRequest {
     private Long senderId;
-    private String message;
+    private Set<UserSessionInfo> userSessionInfos;
     private String roomId;
-    private Set<Long> userIds;
+    private String message;
 }

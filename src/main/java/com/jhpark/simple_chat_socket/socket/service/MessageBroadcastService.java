@@ -5,6 +5,7 @@ import org.springframework.stereotype.Service;
 
 import com.jhpark.simple_chat_socket.common.util.ObjectMapperUtil;
 import com.jhpark.simple_chat_socket.socket.dto.broadcast.BroadcastMessage;
+import com.jhpark.simple_chat_socket.socket.dto.broadcast.UserSessionInfo;
 import com.jhpark.simple_chat_socket.socket.util.DestinationUtil;
 
 import lombok.RequiredArgsConstructor;
@@ -23,9 +24,10 @@ public class MessageBroadcastService {
 
     public void broadcastMessage(
             final Long senderId,
+            final Set<UserSessionInfo> userSessionInfos,
             final String roomId,
-            final String message,
-            final Set<Long> userIds) {
+            final String message
+    ) {
 
         final BroadcastMessage payload = BroadcastMessage.builder()
                 .senderId(senderId)
@@ -33,7 +35,9 @@ public class MessageBroadcastService {
                 .roomId(roomId)
                 .build();
 
-        userIds.stream().parallel().forEach(userId -> {
+        userSessionInfos.stream().parallel().forEach(userSession -> {
+
+            final Long userId = userSession.getUserId();
 
             if (!sessionRegistryService.isUserSubscribed(userId, roomId)) {
                 log.warn("User {} is not online. Skipping message broadcast.", userId);

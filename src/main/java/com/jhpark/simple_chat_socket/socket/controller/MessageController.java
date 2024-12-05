@@ -49,9 +49,9 @@ public class MessageController {
 
         messageBroadcastService.broadcastMessage(
                 broadcastRequest.getSenderId(),
+                broadcastRequest.getUserSessionInfos(),
                 broadcastRequest.getRoomId(),
-                broadcastRequest.getMessage(),
-                broadcastRequest.getUserIds());
+                broadcastRequest.getMessage());
 
         return ResponseEntity.ok().build();
     }
