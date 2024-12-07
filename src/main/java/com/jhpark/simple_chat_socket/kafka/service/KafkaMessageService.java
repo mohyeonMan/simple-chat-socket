@@ -80,7 +80,7 @@ public class KafkaMessageService {
         final UserMetadata userMetadata = UserMetadata.builder()
                 .userId(SessionUtil.extractUserIdBySessionName(senderSessionName))
                 .sessionId(SessionUtil.extractSessionIdBySessionName( senderSessionName))
-                .serverIp(message)
+                .serverIp(serverIp)
                 .build();
 
         kafkaPublisher.publish(
