@@ -84,7 +84,7 @@ pipeline {
                 '''
                 sh '''docker
                 ssh -i ${PEM_FILE} -o StrictHostKeyChecking=no ${SSH_USER}@${SSH_SERVER} <<EOF
-                env DOCKER_IMAGE='${DOCKER_IMAGE}' docker stack deploy --resolve-image changed -c docker-compose.yml simple-chat-socket
+                env DOCKER_IMAGE='${DOCKER_IMAGE}' docker stack deploy --resolve-image always -c docker-compose.yml simple-chat-socket
                 <<EOF
                 '''
             }
