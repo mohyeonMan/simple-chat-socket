@@ -8,7 +8,7 @@ import lombok.Data;
 @Data
 @Builder
 public class ChatMessage {
-    private Long senderId;
+    private UserMetadata senderMetadata;
     private Set<Long> userIds;
     private String roomId;
     private String message;

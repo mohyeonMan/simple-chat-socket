@@ -1,32 +1,27 @@
 package com.jhpark.simple_chat_socket.socket.controller;
 
-import java.security.Principal;
-import java.util.Set;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.messaging.handler.annotation.DestinationVariable;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.Payload;
-import org.springframework.messaging.simp.user.SimpUser;
+import org.springframework.messaging.simp.SimpMessageHeaderAccessor;
 import org.springframework.stereotype.Controller;
 
 import com.jhpark.simple_chat_socket.socket.dto.broadcast.BroadcastRequest;
 import com.jhpark.simple_chat_socket.socket.service.MessageBroadcastService;
 import com.jhpark.simple_chat_socket.socket.service.MessageSendService;
-import com.jhpark.simple_chat_socket.socket.service.SessionRegistryService;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.GetMapping;
 
 @Slf4j
 @Controller
 @RequiredArgsConstructor
 public class MessageController {
 
-    private final SessionRegistryService sessionRegistryService;
     private final MessageBroadcastService messageBroadcastService;
     private final MessageSendService messageSendService;
 
@@ -34,14 +29,9 @@ public class MessageController {
     public void sendMessage(
             @DestinationVariable("roomId") String roomId,
             @Payload String message,
-            Principal principal
+            SimpMessageHeaderAccessor accessor
     ) {
-        messageSendService.sendMessage(roomId, message, principal);
-    }
-
-    @GetMapping("check-users")
-    public ResponseEntity<Set<SimpUser>> getMethodName() {
-        return ResponseEntity.ok().body(sessionRegistryService.getUsers());
+        messageSendService.sendMessage(roomId, message, accessor);
     }
 
     @PostMapping("/broadcast")

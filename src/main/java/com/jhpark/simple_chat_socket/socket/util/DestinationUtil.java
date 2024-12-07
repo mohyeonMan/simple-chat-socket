@@ -27,7 +27,7 @@ public class DestinationUtil {
         return destination.replace(WebSocketConfig.USER_SUBSCRIBE_PREFIX, "");
     }
 
-    public static String getUserDestination(final String roomId){
+    public static String getBroadcastDestination(final String roomId){
         return WebSocketConfig.QUEUE_PREFIX + "/" + roomId;
     }
 
