@@ -11,6 +11,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 
 import com.jhpark.simple_chat_socket.security.service.AuthService;
+import com.jhpark.simple_chat_socket.session.dto.SessionPrincipal;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -35,7 +36,12 @@ public class JwtChannelInterceptor implements ChannelInterceptor {
         if (authHeader != null && authHeader.startsWith(AUTH_PREFIX)) {
             final String token = authHeader.substring(AUTH_PREFIX.length());
             Authentication authentication = authService.checkAccessTokenAndSetAuthentication(token);
-            accessor.setUser(authentication);
+            accessor.setUser(
+                SessionPrincipal.builder()
+                .sessionId(authHeader)
+                .userId(Long.valueOf(authentication.getName()))
+                .build()
+            );
             log.info("Authentication = {}", SecurityContextHolder.getContext().getAuthentication().toString());
     
             return message;

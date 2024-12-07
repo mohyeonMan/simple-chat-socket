@@ -8,7 +8,8 @@ import org.springframework.messaging.support.ChannelInterceptor;
 import org.springframework.stereotype.Component;
 
 import com.jhpark.simple_chat_socket.room.RoomAccessService;
-import com.jhpark.simple_chat_socket.security.util.SecurityUtil;
+import com.jhpark.simple_chat_socket.session.dto.SessionPrincipal;
+import com.jhpark.simple_chat_socket.session.service.SessionRegistryService;
 import com.jhpark.simple_chat_socket.socket.util.DestinationUtil;
 
 import lombok.RequiredArgsConstructor;
@@ -20,26 +21,37 @@ import lombok.extern.slf4j.Slf4j;
 public class SubscriptionInterceptor implements ChannelInterceptor{
 
     private final RoomAccessService roomAccessService;
+    private final SessionRegistryService sessionRegistryService;
 
+
+    /**
+     * 구독요청이 들어올 시 처리순서
+     * 1. 구독 경로를 검증한다.
+     * 2. 현재 해당세션의 다른 구독이 없는지 검증한다. (세션 당 하나의 구독 유도)
+     * 3. 사용자가 유저가 구독 권한이 있는지 검증한다.
+     */
     @Override
     public Message<?> preSend(Message<?> message, MessageChannel channel) {
         StompHeaderAccessor accessor = StompHeaderAccessor.wrap(message);
 
         if (StompCommand.SUBSCRIBE.equals(accessor.getCommand())) {
-
-            log.info("accessor.getDestination() = {}",accessor.getDestination());
+            
             DestinationUtil.validateDestination(accessor.getDestination());
-            log.info("validation success");
 
-            final String roomId = DestinationUtil.extractRoomIdByDestination(accessor.getDestination());
-            final Long userId = SecurityUtil.extractUserIdFromPrincipal(accessor.getUser());
-
-            // 구독 검증
-            if (!roomAccessService.hasAccessToRoom(userId, roomId)) {
+            final SessionPrincipal sessionPrincipal = (SessionPrincipal) accessor.getUser();// sessionPrincipal 추출 
+            
+            // 다른 구독이 없는지 검증
+            sessionRegistryService.validateSessionNotSubscribedAnyDestination(sessionPrincipal.getName());
+            
+            final String roomId = DestinationUtil.extractRoomIdByDestination(accessor.getDestination());    // roomId 추출
+            
+            // 구독 권한 검증
+            if (!roomAccessService.hasAccessToRoom(sessionPrincipal.getUserId(), roomId)) {
                 throw new RuntimeException("User does not have access to room: " + roomId);
             }
         }
 
         return message;
     }
+
 }
