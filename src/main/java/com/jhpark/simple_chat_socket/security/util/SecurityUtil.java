@@ -11,7 +11,8 @@ public class SecurityUtil {
 
             return ((Long) authentication.getPrincipal());
         }
-        return null;
+        
+        throw new RuntimeException("인증되지 않은 사용자입니다.");
     }
 
     

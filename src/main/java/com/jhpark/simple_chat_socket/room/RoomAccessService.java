@@ -3,6 +3,8 @@ package com.jhpark.simple_chat_socket.room;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
+import com.jhpark.simple_chat_socket.redis.service.RedisService;
+
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -11,11 +13,7 @@ import lombok.extern.slf4j.Slf4j;
 @RequiredArgsConstructor
 public class RoomAccessService {
 
-    private final RestTemplate restTemplate;
+    private final RedisService redisService;
     
-    public boolean hasAccessToRoom(final Long userId, String roomId) {
-        log.info("isRoomMemeber roomId={}, userId={}", roomId, userId);
-        return true;
-    }
     
 }
