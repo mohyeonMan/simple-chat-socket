@@ -7,7 +7,7 @@ import org.springframework.messaging.simp.stomp.StompHeaderAccessor;
 import org.springframework.messaging.support.ChannelInterceptor;
 import org.springframework.stereotype.Component;
 
-import com.jhpark.simple_chat_socket.room.RoomAccessService;
+import com.jhpark.simple_chat_socket.room.RoomService;
 import com.jhpark.simple_chat_socket.session.dto.SessionPrincipal;
 import com.jhpark.simple_chat_socket.session.service.SessionRegistryService;
 import com.jhpark.simple_chat_socket.socket.util.DestinationUtil;
@@ -20,7 +20,7 @@ import lombok.extern.slf4j.Slf4j;
 @RequiredArgsConstructor
 public class SubscriptionInterceptor implements ChannelInterceptor{
 
-    private final RoomAccessService roomAccessService;
+    private final RoomService roomService;
     private final SessionRegistryService sessionRegistryService;
 
 
@@ -46,9 +46,9 @@ public class SubscriptionInterceptor implements ChannelInterceptor{
             final String roomId = DestinationUtil.extractRoomIdByDestination(accessor.getDestination());    // roomId 추출
             
             // 구독 권한 검증
-            if (!roomAccessService.hasAccessToRoom(sessionPrincipal.getUserId(), roomId)) {
-                throw new RuntimeException("User does not have access to room: " + roomId);
-            }
+            // if (!roomService.hasAccessToRoom(sessionPrincipal.getUserId(), roomId)) {
+            //     throw new RuntimeException("User does not have access to room: " + roomId);
+            // }
         }
 
         return message;

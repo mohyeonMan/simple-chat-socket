@@ -47,7 +47,7 @@ public class AuthService {
 
         String userId = claims.getSubject();
 
-        return new UsernamePasswordAuthenticationToken(userId, null, null);
+        return new UsernamePasswordAuthenticationToken(userId, token, null);
     }
 
     // 토큰 검증 및 Authentication 설정 (Authentication 객체 반환하도록 수정)
@@ -59,6 +59,14 @@ public class AuthService {
         } else {
             throw new RuntimeException("유효하지 않은 JWT 토큰입니다.");
         }
+    }
+
+    public String getToken() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication == null || authentication.getCredentials() == null) {
+            throw new IllegalStateException("No authentication token found in the SecurityContext");
+        }
+        return (String) authentication.getCredentials(); // 토큰이 credentials에 저장된 경우
     }
 
 }
