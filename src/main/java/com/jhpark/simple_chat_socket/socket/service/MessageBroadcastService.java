@@ -27,7 +27,7 @@ public class MessageBroadcastService {
         public void broadcastMessage(
                         final Long senderId,
                         final Set<UserSessionInfo> userSessionInfos,
-                        final String roomId,
+                        final Long roomId,
                         final String message) {
 
                 final BroadcastMessage payload = BroadcastMessage.builder()

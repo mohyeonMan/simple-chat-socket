@@ -10,6 +10,7 @@ import org.springframework.stereotype.Component;
 import com.jhpark.simple_chat_socket.room.RoomService;
 import com.jhpark.simple_chat_socket.session.dto.SessionPrincipal;
 import com.jhpark.simple_chat_socket.session.service.SessionRegistryService;
+import com.jhpark.simple_chat_socket.session.util.SessionUtil;
 import com.jhpark.simple_chat_socket.socket.util.DestinationUtil;
 
 import lombok.RequiredArgsConstructor;
@@ -38,17 +39,18 @@ public class SubscriptionInterceptor implements ChannelInterceptor{
             
             DestinationUtil.validateDestination(accessor.getDestination());
 
-            final SessionPrincipal sessionPrincipal = (SessionPrincipal) accessor.getUser();// sessionPrincipal 추출 
+            final SessionPrincipal sessionPrincipal = (SessionPrincipal) accessor.getUser();
             
             // 다른 구독이 없는지 검증
             sessionRegistryService.validateSessionNotSubscribedAnyDestination(sessionPrincipal.getName());
             
-            final String roomId = DestinationUtil.extractRoomIdByDestination(accessor.getDestination());    // roomId 추출
+            final Long roomId = DestinationUtil.extractRoomIdByDestination(accessor.getDestination());    // roomId 추출
             
             // 구독 권한 검증
-            if (!roomService.isUserParticipant(sessionPrincipal.getUserId(), roomId)) {
+            if (!roomService.isUserParticipant(roomId, SessionUtil.extractTokenFromPrincipal(accessor.getUser()))) {
                 throw new RuntimeException("User does not have access to room: " + roomId);
             }
+
         }
 
         return message;

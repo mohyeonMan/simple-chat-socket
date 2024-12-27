@@ -8,6 +8,6 @@ import lombok.Data;
 public class BroadcastRequest {
     private Long senderId;
     private Set<UserSessionInfo> userSessionInfos;
-    private String roomId;
+    private Long roomId;
     private String message;
 }

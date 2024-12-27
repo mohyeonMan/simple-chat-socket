@@ -46,13 +46,13 @@ public class SessionRegistryService {
     }
 
     //메시지 전송시 발신자의 구독검증
-    public void validateSessionSubscription(final String sessionName, final String roomId) {
+    public void validateSessionSubscription(final String sessionName, final Long roomId) {
         if (!isSessionSubscribedRoom(sessionName, roomId)) {
             throw new RuntimeException("User is not subscribed to the room.");
         }
     }
 
-    public boolean isSessionSubscribedRoom(final String sessionName, final String roomId) {
+    public boolean isSessionSubscribedRoom(final String sessionName, final Long roomId) {
         final SimpUser user = userRegistry.getUser(sessionName);
     
         if (user == null) {

@@ -37,7 +37,7 @@ public class StompEventHandler {
 
         DestinationUtil.validateDestination(accessor.getDestination());
 
-        final String roomId = DestinationUtil.extractRoomIdByDestination(accessor.getDestination());
+        final Long roomId = DestinationUtil.extractRoomIdByDestination(accessor.getDestination());
         final String sessionId = accessor.getSessionId();
 
         kafkaMessagePublisher.synchronizeSessionOnline(userId, sessionId, roomId);

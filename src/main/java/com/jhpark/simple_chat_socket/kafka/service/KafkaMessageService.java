@@ -38,7 +38,7 @@ public class KafkaMessageService {
     public void synchronizeSessionOnline(
             final Long userId,
             final String sessionId,
-            final String roomId) {
+            final Long roomId) {
 
         log.info("SUBSCRIBE EVENT TO KAFKA: userId={}, sessionId={}, roomId={}, serverIp={}",
                 userId, sessionId, roomId, serverIp);
@@ -71,7 +71,7 @@ public class KafkaMessageService {
     public void sendChatMessage(
             final String senderSessionName,
             final Set<Long> userIds,
-            final String roomId,
+            final Long roomId,
             final String message) {
 
         log.info("SEND MESSAGE TO KAFKA : senderSessionName={}, userIds={}, roomId={}, message={}",

@@ -8,5 +8,5 @@ import lombok.Data;
 public class BroadcastMessage {
     private Long senderId;
     private String message;
-    private String roomId;
+    private Long roomId;
 }

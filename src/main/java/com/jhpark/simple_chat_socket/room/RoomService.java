@@ -30,11 +30,11 @@ public class RoomService {
     private static String ROOM_API_PREFIX = "/api/room";
 
     
-    private String getRoomKey(final String roomId) {
+    private String getRoomKey(final Long roomId) {
         return "room:" + roomId + ":participants";
     }
 
-    public Set<Long> getRoomUserIds(final String roomId, final Principal principal) {
+    public Set<Long> getRoomUserIds(final Long roomId, final Principal principal) {
         // Redis에서 캐시 확인
         Set<Long> userIds = redisService.get(getRoomKey(roomId))
                 .stream()
@@ -55,7 +55,7 @@ public class RoomService {
         return userIds;
     }
 
-    private Set<Long> getRoomUserIdsFromRoomServer(final String roomId, final String token){
+    private Set<Long> getRoomUserIdsFromRoomServer(final Long roomId, final String token){
 
         final String roomPathVariable = "/"+roomId;
 
@@ -75,8 +75,10 @@ public class RoomService {
     public boolean isUserParticipant(final Long roomId, final String token){
 
         final String roomPathVariable = "/"+roomId;
+        final String requestUrl = roomServerUrl+ROOM_API_PREFIX+roomPathVariable+"/is-participant";
 
-        return restApiService.sendRequest(roomServerUrl+ROOM_API_PREFIX+roomPathVariable+"/is-participant", 
+        System.out.println(requestUrl);
+        return restApiService.sendRequest(requestUrl, 
             HttpMethod.GET,
             restApiService.createHeadersWithAuthorization(token),
             null, 

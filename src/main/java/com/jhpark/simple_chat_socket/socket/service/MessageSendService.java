@@ -24,7 +24,7 @@ public class MessageSendService {
     private final RoomService roomService;
 
     public void sendMessage(
-            final String roomId,
+            final Long roomId,
             final String message,
             final SimpMessageHeaderAccessor accessor
     ) {

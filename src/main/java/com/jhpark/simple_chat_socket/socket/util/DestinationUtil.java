@@ -23,11 +23,15 @@ public class DestinationUtil {
         }
     }
     
-    public static String extractRoomIdByDestination(final String destination) {
-        return destination.replace(WebSocketConfig.USER_SUBSCRIBE_PREFIX, "");
+    public static Long extractRoomIdByDestination(final String destination) {
+        try {
+            return Long.parseLong(destination.replace(WebSocketConfig.USER_SUBSCRIBE_PREFIX, ""));
+        } catch (Exception e) {
+            throw new RuntimeException("FAILED TO EXTRACT ROOM ID BY DESTINATION : destination="+destination);
+        }
     }
 
-    public static String getBroadcastDestination(final String roomId){
+    public static String getBroadcastDestination(final Long roomId){
         return WebSocketConfig.QUEUE_PREFIX + "/" + roomId;
     }
 

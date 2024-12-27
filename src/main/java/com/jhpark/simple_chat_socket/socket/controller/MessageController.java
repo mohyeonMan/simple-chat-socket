@@ -27,7 +27,7 @@ public class MessageController {
 
     @MessageMapping("/send/{roomId}")
     public void sendMessage(
-            @DestinationVariable("roomId") String roomId,
+            @DestinationVariable("roomId") Long roomId,
             @Payload String message,
             SimpMessageHeaderAccessor accessor
     ) {

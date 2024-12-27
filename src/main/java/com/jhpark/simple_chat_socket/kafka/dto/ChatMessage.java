@@ -10,6 +10,6 @@ import lombok.Data;
 public class ChatMessage {
     private UserMetadata senderMetadata;
     private Set<Long> userIds;
-    private String roomId;
+    private Long roomId;
     private String message;
 }

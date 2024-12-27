@@ -9,7 +9,7 @@ public class SessionOnlineMessage {
 
     private Long userId;
     private String sessionId;
-    private String roomId;
+    private Long roomId;
     private String serverIp;
 
 }

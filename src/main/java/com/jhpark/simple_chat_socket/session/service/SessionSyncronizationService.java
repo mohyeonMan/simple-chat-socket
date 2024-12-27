@@ -20,7 +20,7 @@ public class SessionSyncronizationService {
     @Async
     public void synchronizeSessionOffline(
             final String sessionName,
-            final String roomId) {
+            final Long roomId) {
 
         if (!sessionRegistryService.isSessionSubscribedRoom(sessionName, roomId)) {
 
