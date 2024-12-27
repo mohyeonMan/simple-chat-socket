@@ -11,6 +11,7 @@ public class SessionPrincipal implements Principal {
     
         private final Long userId;
         private final String sessionId;
+        private final String token;
     
         @Override
         public String getName() {

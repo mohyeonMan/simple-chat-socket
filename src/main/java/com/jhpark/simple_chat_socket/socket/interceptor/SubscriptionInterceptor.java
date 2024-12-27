@@ -46,9 +46,9 @@ public class SubscriptionInterceptor implements ChannelInterceptor{
             final String roomId = DestinationUtil.extractRoomIdByDestination(accessor.getDestination());    // roomId 추출
             
             // 구독 권한 검증
-            // if (!roomService.hasAccessToRoom(sessionPrincipal.getUserId(), roomId)) {
-            //     throw new RuntimeException("User does not have access to room: " + roomId);
-            // }
+            if (!roomService.isUserParticipant(sessionPrincipal.getUserId(), roomId)) {
+                throw new RuntimeException("User does not have access to room: " + roomId);
+            }
         }
 
         return message;

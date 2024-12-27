@@ -1,18 +1,18 @@
 package com.jhpark.simple_chat_socket.room;
 
+import java.security.Principal;
 import java.util.Collections;
-import java.util.List;
-import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpMethod;
 import org.springframework.stereotype.Service;
 
 import com.jhpark.simple_chat_socket.common.service.RestApiService;
 import com.jhpark.simple_chat_socket.redis.service.RedisService;
-import com.jhpark.simple_chat_socket.security.service.AuthService;
+import com.jhpark.simple_chat_socket.session.util.SessionUtil;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -24,35 +24,44 @@ public class RoomService {
 
     private final RestApiService restApiService;
     private final RedisService redisService;
-    private final AuthService authService;
 
+    @Value("${room-server-url}")
     private String roomServerUrl = "http://localhost";
+    private static String ROOM_API_PREFIX = "/api/room";
 
     
-    private String getRoomKey(final Long roomId) {
+    private String getRoomKey(final String roomId) {
         return "room:" + roomId + ":participants";
     }
 
-    public Set<Long> getRoomUserIds(final Long roomId){
-     
-        //redis에서 캐시먼저확인
-        final Set<Long> userIds = Optional.ofNullable(redisService.get(getRoomKey(roomId)).stream().map(Long::valueOf).collect(Collectors.toSet()))
-                .orElseGet(() ->{
-                    log.warn("REDIS CASH NOT FOUND : roomId={}",roomId);
-                return getRoomUserIdsFromRoomServer(roomId);
-            });
-
-        if(userIds ==null || userIds.isEmpty()){
-            throw new RuntimeException("사용자를 가져오는데 실패하였습니다.");
+    public Set<Long> getRoomUserIds(final String roomId, final Principal principal) {
+        // Redis에서 캐시 확인
+        Set<Long> userIds = redisService.get(getRoomKey(roomId))
+                .stream()
+                .map(Long::valueOf)
+                .collect(Collectors.toSet());
+    
+        // 캐시가 없으면 RoomServer에서 가져오기
+        if (userIds == null || userIds.isEmpty()) {
+            log.warn("REDIS CACHE NOT FOUND: roomId={}", roomId);
+            userIds = getRoomUserIdsFromRoomServer(roomId, SessionUtil.extractTokenFromPrincipal(principal));
         }
-
+    
+        // 여전히 값이 없으면 예외 발생
+        if (userIds == null || userIds.isEmpty()) {
+            throw new RuntimeException("GET ROOM PARTICIPANTS FAILED : roomId={}" + roomId);
+        }
+    
         return userIds;
     }
 
-    public Set<Long> getRoomUserIdsFromRoomServer(final Long roomId){
-        final Set<Long> userIds = restApiService.sendRequest(roomServerUrl+"/api/room/"+roomId+"/participants", 
+    private Set<Long> getRoomUserIdsFromRoomServer(final String roomId, final String token){
+
+        final String roomPathVariable = "/"+roomId;
+
+        final Set<Long> userIds = restApiService.sendRequest(roomServerUrl+ROOM_API_PREFIX+roomPathVariable+"/participants", 
             HttpMethod.GET,
-            restApiService.createHeadersWithAuthorization(authService.getToken()),
+            restApiService.createHeadersWithAuthorization(token),
             null, 
             new ParameterizedTypeReference<Set<Long>>() {});
 
@@ -61,6 +70,18 @@ public class RoomService {
         }
 
         return userIds;
+    }
+
+    public boolean isUserParticipant(final Long roomId, final String token){
+
+        final String roomPathVariable = "/"+roomId;
+
+        return restApiService.sendRequest(roomServerUrl+ROOM_API_PREFIX+roomPathVariable+"/is-participant", 
+            HttpMethod.GET,
+            restApiService.createHeadersWithAuthorization(token),
+            null, 
+            new ParameterizedTypeReference<Boolean>() {});
+
     }
     
 }

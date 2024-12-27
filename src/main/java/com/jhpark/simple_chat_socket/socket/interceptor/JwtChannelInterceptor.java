@@ -40,6 +40,7 @@ public class JwtChannelInterceptor implements ChannelInterceptor {
                 SessionPrincipal.builder()
                 .sessionId(accessor.getSessionId())
                 .userId(Long.valueOf(authentication.getName()))
+                .token(token)
                 .build()
             );
             log.info("Authentication = {}", SecurityContextHolder.getContext().getAuthentication().toString());

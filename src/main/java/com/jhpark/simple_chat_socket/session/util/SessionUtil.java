@@ -16,12 +16,20 @@ public class SessionUtil {
     public static String extractSessionIdBySessionName(final String sessionName){
         return sessionName.split(":")[1];
     }
-
     
     public static Long extractUserIdFromPrincipal(final Principal principalObj) {
         
         if(principalObj instanceof SessionPrincipal){
             return ((SessionPrincipal) principalObj).getUserId();
+        }
+        
+        throw new RuntimeException("Failed to extract user id from principal");
+    }
+
+    public static String extractTokenFromPrincipal(final Principal principalObj) {
+        
+        if(principalObj instanceof SessionPrincipal){
+            return ((SessionPrincipal) principalObj).getToken();
         }
         
         throw new RuntimeException("Failed to extract user id from principal");

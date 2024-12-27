@@ -57,14 +57,14 @@ public class AuthService {
             SecurityContextHolder.getContext().setAuthentication(authentication);
             return authentication;
         } else {
-            throw new RuntimeException("유효하지 않은 JWT 토큰입니다.");
+            throw new RuntimeException("INVALID TOKEN.");
         }
     }
 
     public String getToken() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         if (authentication == null || authentication.getCredentials() == null) {
-            throw new IllegalStateException("No authentication token found in the SecurityContext");
+            throw new RuntimeException("AUTHENTICATION TOKEN NOT FOUND.");
         }
         return (String) authentication.getCredentials(); // 토큰이 credentials에 저장된 경우
     }
