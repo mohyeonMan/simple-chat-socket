@@ -24,6 +24,7 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
     private static final String TOPIC_PREFIX = "/join";
     public static final String QUEUE_PREFIX = "/private";
     private static final String DESTINATION_PREFIX =  "/message";
+    private static final String SOCKJS_END_POINT = "/ws-chat-sockjs";
     private static final String END_POINT = "/ws-chat";
     public static final String USER_SUBSCRIBE_PREFIX = "/user"+ QUEUE_PREFIX +"/";
 
@@ -36,9 +37,12 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
     @Override
     public void registerStompEndpoints(StompEndpointRegistry registry) {
         registry
-            .addEndpoint(END_POINT)
+            .addEndpoint(SOCKJS_END_POINT)
             .setAllowedOriginPatterns("*")
             .withSockJS();
+        registry
+            .addEndpoint(END_POINT)
+            .setAllowedOriginPatterns("*");
     }
 
     @Override
