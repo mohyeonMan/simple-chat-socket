@@ -77,7 +77,6 @@ public class RoomService {
         final String roomPathVariable = "/"+roomId;
         final String requestUrl = roomServerUrl+ROOM_API_PREFIX+roomPathVariable+"/is-participant";
 
-        System.out.println(requestUrl);
         return restApiService.sendRequest(requestUrl, 
             HttpMethod.GET,
             restApiService.createHeadersWithAuthorization(token),

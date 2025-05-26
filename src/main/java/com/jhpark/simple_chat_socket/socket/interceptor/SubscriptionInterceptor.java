@@ -39,7 +39,7 @@ public class SubscriptionInterceptor implements ChannelInterceptor{
             
             DestinationUtil.validateDestination(accessor.getDestination());
 
-            final SessionPrincipal sessionPrincipal = (SessionPrincipal) accessor.getUser();
+            final SessionPrincipal sessionPrincipal = SessionUtil.castSessionPrincipalFromPrincipal(accessor.getUser());
             
             // 다른 구독이 없는지 검증
             sessionRegistryService.validateSessionNotSubscribedAnyDestination(sessionPrincipal.getName());
